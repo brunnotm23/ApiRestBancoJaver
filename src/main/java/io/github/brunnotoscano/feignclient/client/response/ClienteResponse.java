@@ -9,9 +9,16 @@ import javax.validation.constraints.NotNull;
 public class ClienteResponse {
 
     private Integer id;
+
+    @NotEmpty(message = "Campo nome não pode ser vazio.")
     private String nome;
+
+    @NotNull(message = "Campo telefone não pode ser vazio.")
     private Long telefone;
-    private boolean correntista;
+
+    @NotNull(message = "Campo correntista não pode ser vazio.")
+    private Boolean correntista;
+
     private float score_credito;
     private float saldo_cc;
 }

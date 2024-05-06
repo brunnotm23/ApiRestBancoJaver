@@ -1,18 +1,24 @@
-package io.github.brunnotoscano.feignclient.controller;
+package io.github.brunnotoscano.feignclient.rest.controller;
 
 import io.github.brunnotoscano.feignclient.client.ClienteClient;
 import io.github.brunnotoscano.feignclient.client.response.ClienteResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.openfeign.SpringQueryMap;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/clientes")
+
 public class ClienteController {
 
+    @Autowired
     private final ClienteClient clienteClient;
 
     @GetMapping("/{id}")
@@ -26,7 +32,7 @@ public class ClienteController {
     }
 
     @PostMapping
-    public ClienteResponse salvar (@RequestBody ClienteResponse cliente){
+    public ClienteResponse salvar(@RequestBody ClienteResponse cliente) {
         return clienteClient.salvar(cliente);
     }
 
