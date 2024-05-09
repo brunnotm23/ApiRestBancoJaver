@@ -11,10 +11,12 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.servers.Server;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.web.bind.annotation.*;
+import static org.springframework.http.HttpStatus.*;
 
 import java.util.List;
 
@@ -73,7 +75,8 @@ public class ClienteController {
             }
     )
     @PostMapping
-    public Cliente salvar(@RequestBody Cliente cliente) {
+    @ResponseStatus(CREATED)
+    public Cliente salvar(@RequestBody @Valid Cliente cliente) {
         return clienteClient.salvar(cliente);
     }
 
@@ -87,6 +90,7 @@ public class ClienteController {
             }
     )
     @DeleteMapping("/{id}")
+    @ResponseStatus(NO_CONTENT)
     public void deletar(@PathVariable Integer id){
         clienteClient.deletar(id);
     }
@@ -102,7 +106,7 @@ public class ClienteController {
             }
     )
     @PutMapping("/{id}")
-    public void atualizar(@PathVariable Integer id, @RequestBody Cliente cliente){
+    public void atualizar(@PathVariable Integer id, @RequestBody @Valid Cliente cliente){
         clienteClient.atualizar(id, cliente);
     }
 
