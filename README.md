@@ -1,6 +1,6 @@
 <img src="https://github.com/brunnotm23/database-banco-javer/assets/99679969/695b8917-3a06-43dc-931a-d7c0c988904e.png" width="250" height="250">
 
-# Database H2 do Banco Javer
+# API REST do Banco Javer
 API REST do Banco **Javer**
 
 É responsável por expor os endpoints das operações CRUD (Create, Read, Update e Delete) da aplicação [Database Banco Javer](https://github.com/brunnotm23/database-banco-javer), 
