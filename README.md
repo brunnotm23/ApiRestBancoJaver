@@ -38,7 +38,7 @@ Referir à documentação para obter mais detalhes sobre as operações e sintax
 - **Atualização de clientes existentes**
 ### DELETE
 - **Remoção de clientes da base de dados**
-## PATCH
+### PATCH
 - **Calcula e salva o score de um dado cliente**
 
 ## Documentação
