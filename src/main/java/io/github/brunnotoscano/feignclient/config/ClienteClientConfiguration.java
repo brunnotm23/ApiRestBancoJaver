@@ -1,11 +1,13 @@
 package io.github.brunnotoscano.feignclient.config;
 
-import feign.Logger;
 import feign.codec.ErrorDecoder;
 import io.github.brunnotoscano.feignclient.CustomErrorDecoder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+//|***********************************************************************|
+//| Descrição: Configuração do Cliente Feign que usa o CustomErrorDecoder |
+//|***********************************************************************|
 @Configuration
 public class ClienteClientConfiguration {
 
@@ -14,8 +16,4 @@ public class ClienteClientConfiguration {
         return new CustomErrorDecoder();
     }
 
-    @Bean
-    Logger.Level feignLoggerLevel() {
-        return Logger.Level.FULL;
-    }
 }

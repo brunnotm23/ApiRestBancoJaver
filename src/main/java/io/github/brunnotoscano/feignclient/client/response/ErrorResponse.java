@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.http.HttpStatus;
 
+//|*************************************************************************|
+//| Descrição: Template de resposta da aplicação no caso de erros previstos |
+//|*************************************************************************|
 @Data
 @AllArgsConstructor
 public class ErrorResponse {
