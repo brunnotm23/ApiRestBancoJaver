@@ -76,7 +76,7 @@ public class ClienteController {
     )
     @PostMapping
     @ResponseStatus(CREATED)
-    public Cliente salvar(@RequestBody @Valid Cliente cliente) {
+    public Cliente salvar(@RequestBody Cliente cliente) {
         return clienteClient.salvar(cliente);
     }
 
