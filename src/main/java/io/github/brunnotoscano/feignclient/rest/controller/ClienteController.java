@@ -106,7 +106,7 @@ public class ClienteController {
             }
     )
     @PutMapping("/{id}")
-    public void atualizar(@PathVariable Integer id, @RequestBody @Valid Cliente cliente){
+    public void atualizar(@PathVariable Integer id, @RequestBody Cliente cliente){
         clienteClient.atualizar(id, cliente);
     }
 
