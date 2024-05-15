@@ -1,17 +1,26 @@
 package io.github.brunnotoscano.feignclient.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.brunnotoscano.feignclient.client.response.Cliente;
+import io.github.brunnotoscano.feignclient.entity.Cliente;
+import io.github.brunnotoscano.feignclient.entity.ClienteDto;
+import io.github.brunnotoscano.feignclient.mapper.ClienteMapper;
 import io.github.brunnotoscano.feignclient.rest.controller.ClienteController;
+import io.github.brunnotoscano.feignclient.service.ClienteService;
+import lombok.ToString;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
@@ -26,6 +35,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.junit.jupiter.api.Assertions.*;
 
 //|**************************************************|
 //| Descrição: Testes unitários do ClienteController |
@@ -41,7 +51,7 @@ public class ClienteControllerTest {
     ObjectMapper objectMapper;
 
     @MockBean
-    private ClienteClient clienteClient;
+    private ClienteService clienteService;
 
     @Mock
     private Cliente cliente;
@@ -49,28 +59,29 @@ public class ClienteControllerTest {
     @BeforeEach
     public void init(){
         cliente = new Cliente();
-        cliente.setId(1);
-        cliente.setTelefone(111L);
-        cliente.setNome("Teste");
-        cliente.setCorrentista(true);
-        cliente.setSaldo_cc(125);
+        cliente.setClientId(1);
+        cliente.setPhoneNumber(111L);
+        cliente.setName("Teste");
+        cliente.setCurrentAccount(true);
+        cliente.setBalance(125);
+        cliente.setCreditScore(12.5F);
     }
 
 
     @Test
     public void ClienteController_GetClienteById_ReturnCliente() throws Exception{
         Integer id = 1;
-        when(clienteClient.getClienteById(id)).thenReturn(cliente);
+        Mockito.when(clienteService.getClienteById(id)).thenReturn(cliente);
 
         mockMvc.perform(get("/clientes/{id}", id))
                 .andExpect(status().isOk())
                 .andExpectAll(
-                        jsonPath("$.id").value(cliente.getId()),
-                        jsonPath("$.telefone").value(cliente.getTelefone()),
-                        jsonPath("$.nome").value(cliente.getNome()),
-                        jsonPath("$.correntista").value(cliente.getCorrentista()),
-                        jsonPath("$.saldo_cc").value(cliente.getSaldo_cc()),
-                        jsonPath("$.score_credito").value(cliente.getScore_credito())
+                        jsonPath("$.clientId").value(cliente.getClientId()),
+                        jsonPath("$.phoneNumber").value(cliente.getPhoneNumber()),
+                        jsonPath("$.name").value(cliente.getName()),
+                        jsonPath("$.currentAccount").value(cliente.getCurrentAccount()),
+                        jsonPath("$.balance").value(cliente.getBalance()),
+                        jsonPath("$.creditScore").value(cliente.getCreditScore())
 
                 );
 
@@ -79,7 +90,7 @@ public class ClienteControllerTest {
     @Test
     public void ClienteController_GetClienteById_Return404() throws Exception{
         Integer id = 1;
-        when(clienteClient.getClienteById(id)).thenThrow(new ResponseStatusException(
+        when(clienteService.getClienteById(id)).thenThrow(new ResponseStatusException(
                 HttpStatus.NOT_FOUND,
                 "Cliente não encontrado."));
 
@@ -89,7 +100,7 @@ public class ClienteControllerTest {
 
     @Test
     public void ClienteController_Save_ReturnCliente() throws Exception{
-        when(clienteClient.salvar(cliente)).thenReturn(cliente);
+        when(clienteService.salvar(cliente)).thenReturn(cliente);
         String body = objectMapper.writeValueAsString(cliente);
 
         mockMvc.perform(post("/clientes")
@@ -98,31 +109,16 @@ public class ClienteControllerTest {
                 )
                 .andExpect(status().isCreated())
                 .andExpectAll(
-                        jsonPath("$.id").value(cliente.getId()),
-                        jsonPath("$.telefone").value(cliente.getTelefone()),
-                        jsonPath("$.nome").value(cliente.getNome()),
-                        jsonPath("$.correntista").value(cliente.getCorrentista()),
-                        jsonPath("$.saldo_cc").value(cliente.getSaldo_cc()),
-                        jsonPath("$.score_credito").value(cliente.getScore_credito())
+                        jsonPath("$.clientId").value(cliente.getClientId()),
+                        jsonPath("$.phoneNumber").value(cliente.getPhoneNumber()),
+                        jsonPath("$.name").value(cliente.getName()),
+                        jsonPath("$.currentAccount").value(cliente.getCurrentAccount()),
+                        jsonPath("$.balance").value(cliente.getBalance()),
+                        jsonPath("$.creditScore").value(cliente.getCreditScore())
 
                 );
     }
 
-    @Test
-    public void ClienteController_Save_Return400() throws Exception{
-        when(clienteClient.salvar(cliente)).thenReturn(cliente);
-        cliente.setNome(null);
-        cliente.setTelefone(null);
-        cliente.setCorrentista(null);
-        String body = objectMapper.writeValueAsString(cliente);
-
-
-        mockMvc.perform(post("/clientes")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(body)
-                )
-                .andExpect(status().isBadRequest());
-    }
 
     @Test
     public void ClienteController_Delete_Return204() throws Exception {
@@ -139,7 +135,7 @@ public class ClienteControllerTest {
         Integer id = 1;
 
         doThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Cliente não encontrado."))
-                .when(clienteClient).deletar(eq(id));
+                .when(clienteService).deletar(eq(id));
 
         mockMvc.perform(delete("/clientes/{id}", id))
                 .andExpect(status().isNotFound());
@@ -157,38 +153,22 @@ public class ClienteControllerTest {
                 .andExpect(status().isOk());
     }
 
-    @Test
-    public void ClienteController_Update_Return400() throws Exception{
-        Integer id = 1;
-        cliente.setNome(null);
-        cliente.setTelefone(null);
-        cliente.setCorrentista(null);
-        String body = objectMapper.writeValueAsString(cliente);
-
-        clienteClient.atualizar(1, cliente);
-
-        mockMvc.perform(put("/clientes/{id}", id)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(body))
-                .andExpect(status().isBadRequest())
-                .andDo(print());
-    }
 
     @Test
     public void ClienteController_Find_ReturnCliente() throws Exception {
         List<Cliente> clientesSimulados = new ArrayList<>();
         clientesSimulados.add(cliente);
-        when(clienteClient.buscar(argThat(clienteBuscado -> clienteBuscado.getNome().equals(cliente.getNome())))).thenReturn(clientesSimulados);
+        when(clienteService.buscar(argThat(clienteBuscado -> clienteBuscado.getName().equals(cliente.getName())))).thenReturn(clientesSimulados);
 
 
         // Faz uma requisição GET para o endpoint "/api/clientes/buscar" com os parâmetros adequados
         mockMvc.perform(get("/clientes/buscar")
-                        .param("nome", cliente.getNome()))
+                        .param("name", cliente.getName()))
                 .andExpect(status().isOk())
                 .andExpectAll(
-                        jsonPath("$[0].id").value(cliente.getId()),
-                        jsonPath("$[0].nome").value(cliente.getNome()),
-                        jsonPath("$[0].correntista").value(cliente.getCorrentista())
+                        jsonPath("$[0].clientId").value(cliente.getClientId()),
+                        jsonPath("$[0].name").value(cliente.getName()),
+                        jsonPath("$[0].currentAccount").value(cliente.getCurrentAccount())
                 );
 
     }
@@ -196,22 +176,32 @@ public class ClienteControllerTest {
     @Test
     public void ClienteController_Find_ReturnEmpty() throws Exception {
         List<Cliente> clientesSimulados = new ArrayList<>();
-        when(clienteClient.buscar(argThat(clienteBuscado -> clienteBuscado.getNome().equals(cliente.getNome())))).thenReturn(clientesSimulados);
+        when(clienteService.buscar(argThat(clienteBuscado -> clienteBuscado.getName().equals(cliente.getName())))).thenReturn(clientesSimulados);
 
 
         // Faz uma requisição GET para o endpoint "/api/clientes/buscar" com os parâmetros adequados
         mockMvc.perform(get("/clientes/buscar")
-                        .param("nome", cliente.getNome()))
+                        .param("name", cliente.getName()))
                 .andExpect(status().isOk())
                 .andExpectAll(
-                        jsonPath("$[0].id").doesNotExist(),
-                        jsonPath("$[0].nome").doesNotExist(),
-                        jsonPath("$[0].correntista").doesNotExist(),
-                        jsonPath("$[0].saldo_cc").doesNotExist(),
-                        jsonPath("$[0].telefone").doesNotExist(),
-                        jsonPath("$[0].score_credito").doesNotExist()
+                        jsonPath("$[0].clientId").doesNotExist(),
+                        jsonPath("$[0].name").doesNotExist(),
+                        jsonPath("$[0].currentAccount").doesNotExist(),
+                        jsonPath("$[0].balance").doesNotExist(),
+                        jsonPath("$[0].phoneNumber").doesNotExist(),
+                        jsonPath("$[0].creditScore").doesNotExist()
                 );
+    }
 
+    @Test
+    public void ClienteController_CalculaScore_ReturnScore() throws Exception {
+        Integer id = 1;
+        when(clienteService.calculaScore(id)).thenReturn(cliente.getCreditScore());
+
+        MvcResult result = mockMvc.perform(patch("/clientes/score/{id}", id))
+                .andExpect(status().isOk())
+                .andReturn();
+        assertEquals(Float.toString(cliente.getCreditScore()), result.getResponse().getContentAsString());
     }
 
 }

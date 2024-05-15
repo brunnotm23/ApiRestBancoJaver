@@ -1,8 +1,11 @@
 package io.github.brunnotoscano.feignclient.rest.controller;
 
 import io.github.brunnotoscano.feignclient.client.ClienteClient;
-import io.github.brunnotoscano.feignclient.client.response.Cliente;
-import io.github.brunnotoscano.feignclient.client.response.ErrorResponse;
+import io.github.brunnotoscano.feignclient.entity.Cliente;
+import io.github.brunnotoscano.feignclient.entity.ClienteDto;
+import io.github.brunnotoscano.feignclient.entity.ErrorResponse;
+import io.github.brunnotoscano.feignclient.mapper.ClienteMapper;
+import io.github.brunnotoscano.feignclient.service.ClienteService;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.info.Contact;
@@ -10,9 +13,9 @@ import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.servers.Server;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.web.bind.annotation.*;
@@ -39,7 +42,7 @@ import java.util.List;
 public class ClienteController {
 
     @Autowired
-    private final ClienteClient clienteClient;
+    private final ClienteService clienteService;
 
 
     @Operation(summary = "Buscar Cliente por ID", description = "Endpoint GET de um Cliente pelo ID fornecido",
@@ -53,7 +56,7 @@ public class ClienteController {
     )
     @GetMapping("/{id}")
     public Cliente getClienteById(@PathVariable Integer id){
-        return clienteClient.getClienteById(id);
+        return clienteService.getClienteById(id);
     }
 
     @Operation(summary = "Buscar Cliente", description = "Busca clientes baseado nos parâmetros fornecidos",
@@ -63,7 +66,7 @@ public class ClienteController {
     )
     @GetMapping("/buscar")
     public List<Cliente> buscar(@SpringQueryMap Cliente filtro){
-        return clienteClient.buscar(filtro);
+        return clienteService.buscar(filtro);
     }
 
     @Operation(summary = "Criar Cliente", description = "Cria um cliente com as informações fornecidas",
@@ -77,7 +80,7 @@ public class ClienteController {
     @PostMapping
     @ResponseStatus(CREATED)
     public Cliente salvar(@RequestBody Cliente cliente) {
-        return clienteClient.salvar(cliente);
+        return clienteService.salvar(cliente);
     }
 
     @Operation(summary = "Deletar Cliente", description = "Deleta o cliente que possuir o ID fornecido",
@@ -92,7 +95,7 @@ public class ClienteController {
     @DeleteMapping("/{id}")
     @ResponseStatus(NO_CONTENT)
     public void deletar(@PathVariable Integer id){
-        clienteClient.deletar(id);
+        clienteService.deletar(id);
     }
 
     @Operation(summary = "Atualizar Cliente", description = "Atualiza um cliente com as informações fornecidas",
@@ -107,7 +110,7 @@ public class ClienteController {
     )
     @PutMapping("/{id}")
     public void atualizar(@PathVariable Integer id, @RequestBody Cliente cliente){
-        clienteClient.atualizar(id, cliente);
+        clienteService.atualizar(id, cliente);
     }
 
     @Operation(summary = "Calcular e Salvar Score", description = "Calcula e salva o score do cliente fornecido",
@@ -121,11 +124,7 @@ public class ClienteController {
     )
     @PatchMapping("/score/{id}")
     public float calculaScore(@PathVariable Integer id){
-        Cliente cliente = getClienteById(id);
-        float score = (float) (cliente.getSaldo_cc() * 0.1);
-        cliente.setScore_credito(score);
-        salvar(cliente);
-        return score;
+        return clienteService.calculaScore(id);
     }
 
 

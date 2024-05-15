@@ -1,30 +1,23 @@
-package io.github.brunnotoscano.feignclient.client.response;
+package io.github.brunnotoscano.feignclient.entity;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.ToString;
 
 
-
-//|**********************************************************************|
-//| Descrição: Template da classe Cliente recebida e enviada ao servidor |
-//|**********************************************************************|
+//|*********************************************|
+//| Descrição: Template da classe Cliente local |
+//|*********************************************|
 @Data
 public class Cliente {
 
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
-    private Integer id;
-
-    @NotBlank
-    private String nome;
-
-    @NotNull
-    private Long telefone;
-
-    @NotNull
-    private Boolean correntista;
-
-    private float score_credito;
-    private float saldo_cc;
+    private Integer clientId;
+    private String name;
+    private Long phoneNumber;
+    private Boolean currentAccount;
+    private float creditScore;
+    private float balance;
 }

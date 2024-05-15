@@ -1,4 +1,4 @@
-package io.github.brunnotoscano.feignclient.client.response;
+package io.github.brunnotoscano.feignclient.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
